@@ -4,32 +4,32 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from app.models import Post, PostComment, PostLike, User, UserFollow
-from app import serializer
+from app.serializer import (PostSerializer, PostLikeSerializer,
+                            CommentSerializer, UserFollowSerializer)
 
 
 class CreatePostGV(generics.CreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = Post.objects.all()
-    serializer_class = serializer.PostSerializer
+    serializer_class = PostSerializer
 
 
 class RetrievePostGV(generics.RetrieveAPIView):
     queryset = Post.objects.all()
-    serializer_class = serializer.PostSerializer
+    serializer_class = PostSerializer
 
 
 class UpdatePostGV(generics.UpdateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = Post.objects.all()
-    serializer_class = serializer.PostSerializer
+    serializer_class = PostSerializer
 
     def put(self, request, pk):
         try:
             post = Post.objects.get(id=pk)
-            serializer = serializer.PostSerializer(post,
-                                                   data=request.data, partial=True)
+            serializer = PostSerializer(post, data=request.data, partial=True)
 
             if serializer.is_valid():
                 serializer.save(user=request.user)
@@ -47,7 +47,7 @@ class DestroyPostGV(generics.DestroyAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = Post.objects.all()
-    serializer_class = serializer.PostSerializer
+    serializer_class = PostSerializer
 
     def destroy(self, request, *args, **kwargs):
         try:
@@ -67,7 +67,7 @@ class DestroyPostGV(generics.DestroyAPIView):
 
 class RetrieveUserPostsGV(generics.ListAPIView):
     queryset = Post.objects.all()
-    serializer_class = serializer.PostSerializer
+    serializer_class = PostSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -81,14 +81,14 @@ class RetrieveUserPostsGV(generics.ListAPIView):
 class LikePostAPIView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = serializer.PostLikeSerializer
+    serializer_class = PostLikeSerializer
 
     def get(self, request, pk):
         try:
             post = Post.objects.get(id=pk)
             likes_list = PostLike.objects.filter(post=post)
-            serializer = serializer.PostLikeSerializer(likes_list,
-                                                       many=True)
+            serializer = PostLikeSerializer(likes_list,
+                                            many=True)
             return Response({"success": True, "likes_list": serializer.data},
                             status=status.HTTP_200_OK)
 
@@ -116,7 +116,7 @@ class LikePostAPIView(APIView):
 
 class CommentPostGV(generics.CreateAPIView):
     queryset = Post.objects.all()
-    serializer_class = serializer.CommentSerializer
+    serializer_class = CommentSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -134,7 +134,8 @@ class CommentPostGV(generics.CreateAPIView):
     def post(self, request, pk):
         try:
             post = Post.objects.get(id=pk)
-            serializer = self.serializer_class(data=request.data)
+            serializer = self.serializer_class(
+                data=request.data, context={'request': request})
             if serializer.is_valid():
                 serializer.save(post=post, user=request.user)
                 return Response({"success": True, "message": "comment added"},
@@ -149,16 +150,16 @@ class CommentPostGV(generics.CreateAPIView):
 
 class FollowUserAPIView(APIView):
     queryset = UserFollow.objects.all()
-    serializer_class = serializer.UserFollowSerializer
+    serializer_class = UserFollowSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         following = UserFollow.objects.filter(user=request.user)
         followers = UserFollow.objects.filter(follows=request.user)
-        following_serializer = serializer.UserFollowSerializer(
+        following_serializer = UserFollowSerializer(
             following, many=True)
-        followers_serializer = serializer.UserFollowSerializer(
+        followers_serializer = UserFollowSerializer(
             followers, many=True)
         return Response({"success": True, "following": following_serializer.data,
                          "followers": followers_serializer.data}, status=status.HTTP_200_OK)

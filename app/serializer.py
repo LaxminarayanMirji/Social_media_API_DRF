@@ -62,7 +62,7 @@ class PostSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostComment
-        fields = "__all__"
+        fields = ["comment_text", "user", "post"]
 
     comment_text = serializers.CharField(max_length=264)
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
