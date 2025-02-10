@@ -3,9 +3,12 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from app.models import Post, PostComment, PostLike, User, UserFollow
+from app.models import Post, PostComment, PostLike, User, UserFollow, Activity
 from app.serializer import (PostSerializer, PostLikeSerializer,
-                            CommentSerializer, UserFollowSerializer)
+                            CommentSerializer, UserFollowSerializer,
+                            ActivitySerializer)
+from django.core.cache import cache
+from rest_framework.decorators import api_view, permission_classes
 
 
 class CreatePostGV(generics.CreateAPIView):
@@ -179,3 +182,16 @@ class FollowUserAPIView(APIView):
         except User.DoesNotExist:
             return Response({"success": False, "message": "following user does not exist"},
                             status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def activity_feed(request):
+    cache_key = f"feed_{request.user.id}"
+    feed = cache.get(cache_key)
+
+    if not feed:
+        feed = Activity.objects.filter(user__in=request.user.following.all())[:50]
+        cache.set(cache_key, feed, timeout=300)
+
+    serializer = ActivitySerializer(feed, many=True)
+    return Response(serializer.data)

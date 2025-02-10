@@ -88,3 +88,11 @@ class UserFollowSerializer(serializers.ModelSerializer):
         fields = "__all__"
     user = serializers.PrimaryKeyRelatedField(read_only=True)
     follows_id = serializers.PrimaryKeyRelatedField(read_only=True)
+
+from rest_framework import serializers
+from .models import Activity
+
+class ActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = '__all__'

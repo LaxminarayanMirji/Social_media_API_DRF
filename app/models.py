@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from .manager import UserManager
+from django.utils.timezone import now
 
 
 class User(AbstractUser):
@@ -60,3 +61,23 @@ class UserFollow(models.Model):
         User, null=False, on_delete=models.CASCADE, related_name="src_follow")
     follows = models.ForeignKey(
         User, null=False, on_delete=models.CASCADE, related_name="dest_follow")
+
+class Activity(models.Model):
+    ACTION_TYPES = [
+        ('post_created', 'Post Created'),
+        ('liked', 'Liked'),
+        ('commented', 'Commented'),
+        ('followed', 'Followed'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action_type = models.CharField(max_length=20, choices=ACTION_TYPES)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, null=True, blank=True)
+    target_user = models.ForeignKey(User, related_name="target_user", on_delete=models.CASCADE, null=True, blank=True)
+    timestamp = models.DateTimeField(default=now)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.user} {self.get_action_type_display()} {self.post or self.target_user}"

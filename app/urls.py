@@ -3,6 +3,7 @@ from app.views import user, post
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
     path('user/create/', user.CreateUserGV.as_view(), name='create-user'),
     path('user/login/', user.LoginUserAPIView.as_view(), name='login'),
@@ -24,6 +25,8 @@ urlpatterns = [
 
     path('user/follow/<int:pk>/', post.FollowUserAPIView.as_view(),
          name='follow/unfollow-post'),
+
+     path('api/active-feed/', post.activity_feed,name='active-feed'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
