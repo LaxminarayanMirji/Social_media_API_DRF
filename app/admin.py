@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Post, PostLike, PostComment, UserFollow
+from .models import User, Post, PostLike, PostComment, UserFollow, Activity 
 
 
 class CustomUserAdmin(admin.ModelAdmin):
@@ -65,3 +65,12 @@ class UserFollowAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserFollow, UserFollowAdmin)
+
+
+
+class ActivityAdmin(admin.ModelAdmin):
+    list_display = ('user', 'action', 'timestamp')  # Customize as needed
+    search_fields = ('user__username', 'action')
+    ordering = ('-timestamp',)
+
+admin.site.register(Activity , ActivityAdmin)
