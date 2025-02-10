@@ -183,15 +183,19 @@ class FollowUserAPIView(APIView):
             return Response({"success": False, "message": "following user does not exist"},
                             status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def activity_feed(request):
-    cache_key = f"feed_{request.user.id}"
-    feed = cache.get(cache_key)
 
-    if not feed:
-        feed = Activity.objects.filter(user__in=request.user.following.all())[:50]
-        cache.set(cache_key, feed, timeout=300)
 
-    serializer = ActivitySerializer(feed, many=True)
-    return Response(serializer.data)
+class ActivityFeedGV(generics.ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = ActivitySerializer
+
+    def get_queryset(self):
+        cache_key = f"feed_{self.request.user.id}"
+        feed = cache.get(cache_key)
+
+        if not feed:
+            feed = Activity.objects.filter(user__in=self.request.user.following.all())[:50]
+            cache.set(cache_key, feed, timeout=300)
+
+        return feed
