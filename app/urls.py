@@ -25,8 +25,9 @@ urlpatterns = [
 
     path('user/follow/<int:pk>/', post.FollowUserAPIView.as_view(),
          name='follow/unfollow-post'),
+    
+    path('user/activity-feed/', post.ActivityFeedGV.as_view(), name='activity-feed'),
 
-     path('api/active-feed/', post.activity_feed,name='active-feed'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
