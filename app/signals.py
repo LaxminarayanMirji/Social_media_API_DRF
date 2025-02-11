@@ -7,7 +7,7 @@ from app.models import Post, PostLike, UserFollow
 @receiver(post_save, sender=Post)
 def create_post_activity(sender, instance, created, **kwargs):
     if created:
-        Activity.objects.create(user=instance.author, action_type='post_created', post=instance)
+        Activity.objects.create(user=instance.user, action_type='post_created', post=instance)
 
 @receiver(post_save, sender=PostLike)
 def create_like_activity(sender, instance, created, **kwargs):
