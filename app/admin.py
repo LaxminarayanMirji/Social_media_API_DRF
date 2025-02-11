@@ -67,10 +67,8 @@ class UserFollowAdmin(admin.ModelAdmin):
 admin.site.register(UserFollow, UserFollowAdmin)
 
 
-
+@admin.register(Activity)
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('user', 'action', 'timestamp')  # Customize as needed
     search_fields = ('user__username', 'action')
     ordering = ('-timestamp',)
-
-admin.site.register(Activity , ActivityAdmin)
