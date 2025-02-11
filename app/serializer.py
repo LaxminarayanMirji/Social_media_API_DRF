@@ -43,20 +43,21 @@ class UserLoginSerializer(serializers.Serializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = ['id', 'title', 'description', 'image', 'video',
-                  'created_at', 'updated_at', 'user']
-
-    title = serializers.CharField()
-    description = serializers.CharField()
-    image = serializers.ImageField(required=False)
-    video = serializers.FileField(required=False)
+    likes_count = serializers.SerializerMethodField()
+    comments_count = serializers.SerializerMethodField()
+    created_at = serializers.DateTimeField(format="%b %d, %Y %I:%M %p", read_only=True)  
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
-    def create(self, validated_data):
-        post = Post.objects.create(**validated_data)
-        return post
+    class Meta:
+        model = Post
+        fields = ["id", "title", "description", "image", "video", 
+                  "created_at", "updated_at", "user", "likes_count", "comments_count"]
+
+    def get_likes_count(self, obj):
+        return obj.postlike_set.count()
+
+    def get_comments_count(self, obj):
+        return obj.postcomment_set.count() 
 
 
 class CommentSerializer(serializers.ModelSerializer):
