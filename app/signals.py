@@ -17,4 +17,4 @@ def create_like_activity(sender, instance, created, **kwargs):
 @receiver(post_save, sender=UserFollow)
 def create_follow_activity(sender, instance, created, **kwargs):
     if created:
-        Activity.objects.create(user=instance.follower, action_type='followed', target_user=instance.followed)
+        Activity.objects.create(user=instance.user, action_type='followed', target_user=instance.follows)
