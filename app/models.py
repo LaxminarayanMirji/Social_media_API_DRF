@@ -58,9 +58,10 @@ class PostComment(models.Model):
 
 class UserFollow(models.Model):
     user = models.ForeignKey(
-        User, null=False, on_delete=models.CASCADE, related_name="src_follow")
+        User, null=False, on_delete=models.CASCADE, related_name="following")
     follows = models.ForeignKey(
-        User, null=False, on_delete=models.CASCADE, related_name="dest_follow")
+        User, null=False, on_delete=models.CASCADE, related_name="followers")
+
 
 class Activity(models.Model):
     ACTION_TYPES = [
