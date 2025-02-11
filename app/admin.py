@@ -67,8 +67,13 @@ class UserFollowAdmin(admin.ModelAdmin):
 admin.site.register(UserFollow, UserFollowAdmin)
 
 
+
 @admin.register(Activity)
 class ActivityAdmin(admin.ModelAdmin):
-    list_display = ('user', 'action', 'timestamp')  # Customize as needed
-    search_fields = ('user__username', 'action')
-    ordering = ('-timestamp',)
+    list_display = ('user', 'get_action_type', 'post', 'target_user', 'timestamp')
+
+    def get_action_type(self, obj):
+        return obj.get_action_type_display()
+
+    get_action_type.admin_order_field = 'action_type'
+    get_action_type.short_description = 'Action Type'
