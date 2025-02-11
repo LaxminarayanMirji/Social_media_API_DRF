@@ -188,7 +188,7 @@ class FollowUserAPIView(APIView):
 class ActivityFeedGV(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = ActivitySerializer
+    serializer_class = PostSerializer
 
     def get_queryset(self):
         cache_key = f"feed_{self.request.user.id}"
