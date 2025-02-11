@@ -195,7 +195,9 @@ class ActivityFeedGV(generics.ListAPIView):
         feed = cache.get(cache_key)
 
         if not feed:
-            feed = Activity.objects.filter(user__in=self.request.user.following.all())[:50]
+            followed_users = self.request.user.following.values_list('follows', flat=True)  
+
+            feed = Activity.objects.filter(user_id__in=followed_users)[:50]
             cache.set(cache_key, feed, timeout=300)
 
         return feed
