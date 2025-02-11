@@ -41,7 +41,7 @@ class Post(models.Model):
 
 
 class PostLike(models.Model):
-    post = models.ForeignKey(Post, null=False, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, null=False, on_delete=models.CASCADE, related_name = "likes")
     user = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
 
     class Meta:
@@ -53,7 +53,7 @@ class PostComment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, null=False, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, null=False, on_delete=models.CASCADE,related_name = "comments")
 
 
 class UserFollow(models.Model):
